@@ -61,6 +61,7 @@ def create_record(record):
         session.commit()
 
 
+# start region team functions
 def update_team(team):
     #  updates a team in the database
     with Session(engine) as session:
@@ -74,6 +75,22 @@ def soft_delete_team(team):
         session.execute(update(Team).where(Team.id == team.id).values(skill_level=team.skill_level, team_size=-1))
         session.commit()
 
+# end region team functions
+# start region lane functions
+
+def update_lane(lane):
+    with Session(engine) as session:
+        session.execute(delete(Lane).where(Lane.id == lane.id).values(max_capacity=lane.max_capacity, difficulty=lane.difficulty))
+        session.commit()
+
+
+def soft_delete_lane(lane):
+    # soft deletes a record in the lane table by setting max_capacity to -1
+    with Session(engine) as session:
+        session.execute(update(Lane).where(Lane.id == lane.id).values(max_capacity=-1, difficulty=lane.difficulty))
+
+# end region lane
+# start region booking
 
 if __name__ == "__main__":  #executed when file is executed directly
     engine = create_engine(Database, echo=False, future=True)

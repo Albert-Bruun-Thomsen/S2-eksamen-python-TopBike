@@ -66,8 +66,44 @@ def read_lane_entries():
     return entry_lane_id.get(), entry_lane_max_capacity.get(), entry_lane_difficulty.get()
 
 
-# def clear_lane_entries():
-#     entry
+def clear_lane_entries():
+    entry_lane_id.delete(0, tk.END)
+    entry_lane_max_capacity.delete(0, tk.END)
+    entry_lane_difficulty.delete(0, tk.END)
+
+
+def write_lane_entries(values):
+    entry_lane_id.insert(0, values[0])
+    entry_lane_max_capacity.insert(0, values[1])
+    entry_lane_difficulty.insert(0, values[2])
+
+
+def edit_lane(event, tree):
+    index_selected = tree.focus()
+    values = tree.item(index_selected, "values")
+    clear_lane_entries()
+    write_lane_entries(values)
+
+
+def create_lane(tree, record):
+    lane = tbd.Lane.convert_from_tuple(record)
+    tbsql.create_record(lane)
+    clear_lane_entries()
+    refresh_treeview(tree, tbd.Lane)
+
+
+def update_lane(tree, record):
+    lane = tbd.Lane.convert_from_tuple(record)
+    tbsql.update_lane(lane)
+    clear_lane_entries()
+    refresh_treeview(tree, tbd.Lane)
+
+
+def delete_lane(tree, record):
+    lane = tbd.Lane.convert_from_tuple(record)
+    tbsql.soft_delete_lane(lane)
+    clear_lane_entries()
+    refresh_treeview()
 
 def read_table(tree, class_):  # fill tree from database
     count = 0  # Used to keep track of odd and even rows, because these will be colored differently.
@@ -91,7 +127,7 @@ def empty_treeview(tree):
 
 main_window = tk.Tk()  # Define the main window
 main_window.title('Topbike')  # Text shown in the top window bar
-main_window.geometry("500x500")  # window size
+main_window.geometry("900x500")  # window size first is width second is height
 
 style = ttk.Style()
 style.theme_use('default')
@@ -121,7 +157,7 @@ tree_teams.column("team_size", anchor=tk.CENTER, width=100)
 tree_teams.heading("#0", text="", anchor=tk.W)  # Create column headings
 tree_teams.heading("id", text="Id", anchor=tk.CENTER)
 tree_teams.heading("skill_level", text="Skill level", anchor=tk.CENTER)
-tree_teams.heading("team_size", text="Teams size", anchor=tk.CENTER)
+tree_teams.heading("team_size", text="Team size", anchor=tk.CENTER)
 tree_teams.tag_configure('oddrow', background=oddrow)  # Create tags for rows in 2 different colors
 tree_teams.tag_configure('evenrow', background=evenrow)
 
@@ -208,7 +244,7 @@ label_lane_id.grid(row=0, column=0, padx=padx, pady=pady)
 entry_lane_id = tk.Entry(edit_frame_lanes, width=4, justify="center")
 entry_lane_id.grid(row=1, column=0, padx=padx, pady=pady)
 
-label_lane_max_capacity = tk.Label(edit_frame_lanes, text="Skill level")
+label_lane_max_capacity = tk.Label(edit_frame_lanes, text="Max capacity")
 label_lane_max_capacity.grid(row=0, column=1, padx=padx, pady=pady)
 entry_lane_max_capacity = tk.Entry(edit_frame_lanes, width=10, justify="center")
 entry_lane_max_capacity.grid(row=1, column=1, padx=padx, pady=pady)
@@ -234,6 +270,6 @@ button_clear_lane_entries.grid(row=0, column=4, padx=padx, pady=pady)
 
 if __name__ == "__main__":
     refresh_treeview(tree_teams, tbd.Team)
-    # refresh_treeview(tree_lanes, tbd.Lane)
+    refresh_treeview(tree_lanes, tbd.Lane)
     # refresh_treeview(tree_booking, tbd.Booking)
     main_window.mainloop()
