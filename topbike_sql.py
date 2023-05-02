@@ -49,7 +49,7 @@ def select_all(classparam):
 def get_record(classparam, record_id):  # https://docs.sqlalchemy.org/en/14/tutorial/data_select.html
     # return the record in classparams table with a certain id
     with Session(engine) as session:
-        record = session.scalars(select(classparam).where(classparam.id_label == record_id)).first()
+        record = session.scalars(select(classparam).where(classparam.id == record_id)).first()
     return record
 
 

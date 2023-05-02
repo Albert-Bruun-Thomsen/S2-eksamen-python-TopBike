@@ -84,7 +84,7 @@ class Booking(Base):
         return value >= 0
 
     @staticmethod
-    def convert_from(tuple_):
+    def convert_from_tuple(tuple_):
         try:
             if tuple_[0] != '':
                 id_ = int(tuple_[0])
