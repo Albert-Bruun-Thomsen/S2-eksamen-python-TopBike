@@ -16,11 +16,11 @@ evenrow = "#cccccc"
 
 
 # team function start region
-def read_team_entries():  #  reads all team entries
+def read_team_entries():  # reads all team entries
     return entry_team_id.get(), entry_team_skill_level.get(), entry_team_team_size.get()
 
 
-def clear_team_entries():  #  clear all team entries
+def clear_team_entries():  # clear all team entries
     entry_team_id.delete(0, tk.END)
     entry_team_skill_level.delete(0, tk.END)
     entry_team_team_size.delete(0, tk.END)
@@ -59,6 +59,7 @@ def delete_team(tree, record):
     clear_team_entries()
     refresh_treeview(tree, tbd.Team)
 
+
 # team function end region------------------------------
 # lane function start region
 
@@ -68,15 +69,15 @@ def read_lane_entries():
 
 
 def clear_lane_entries():
-    entry_booking_id.delete(0, tk.END)
-    entry_booking_date.delete(0, tk.END)
-    entry_booking_team_id.delete(0, tk.END)
+    entry_lane_id.delete(0, tk.END)
+    entry_lane_max_capacity.delete(0, tk.END)
+    entry_lane_difficulty.delete(0, tk.END)
 
 
 def write_lane_entries(values):
     entry_lane_id.insert(0, values[0])
-    entry_lane_date.insert(0, values[1])
-    entry_lane_team_id.insert(0, values[2])
+    entry_lane_max_capacity.insert(0, values[1])
+    entry_lane_difficulty.insert(0, values[2])
 
 
 def edit_lane(event, tree):
@@ -104,7 +105,8 @@ def delete_lane(tree, record):
     lane = tbd.Lane.convert_from_tuple(record)
     tbsql.soft_delete_lane(lane)
     clear_lane_entries()
-    refresh_treeview()
+    refresh_treeview(tree, tbd.Lane)
+
 
 #  end region lane functions
 # start region booking functions
@@ -128,7 +130,7 @@ def write_booking_entries(values):
     entry_booking_lane_id.insert(0, values[3])
 
 
-def edit_booking(event,tree):
+def edit_booking(event, tree):
     index_selected = tree.focus()
     values = tree.item(index_selected, "values")
     clear_booking_entries()
@@ -140,8 +142,8 @@ def create_booking(tree, record):
     print(booking)
     lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date)
     capacity_ok = tbf.capacity_ok(tbsql.get_record(tbd.Lane, booking.lane_id), tbsql.get_record(tbd.Team, booking.team_id))
-    if lane_available: # checks if land is available
-        if capacity_ok: # checks if the max capacity has been reached
+    if lane_available:  # checks if land is available
+        if capacity_ok:  # checks if the max capacity has been reached
             tbsql.create_record(booking)
             clear_booking_entries()
             refresh_treeview(tree, tbd.Booking)
@@ -150,13 +152,14 @@ def create_booking(tree, record):
     else:
         messagebox.showwarning("", "Lane is already booked on that date!")
 
+
 def update_booking(tree, record):
     booking = tbd.Booking.convert_from_tuple(record)
     print(booking)
     lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date)
     capacity_ok = tbf.capacity_ok(tbsql.get_record(tbd.Lane, booking.lane_id), tbsql.get_record(tbd.Team, booking.team_id))
-    if lane_available: # checks if land is available
-        if capacity_ok: # checks if the max capacity has been reached
+    if lane_available:  # checks if land is available
+        if capacity_ok:  # checks if the max capacity has been reached
             tbsql.update_booking(booking)
             clear_booking_entries()
             refresh_treeview(tree, tbd.Booking)
@@ -165,11 +168,13 @@ def update_booking(tree, record):
     else:
         messagebox.showwarning("", "Lane is already booked on that date!")
 
+
 def delete_booking(tree, record):
     booking = tbd.Booking.convert_from_tuple(record)
     tbsql.soft_delete_booking(booking)
     clear_booking_entries()
     refresh_treeview(tree, tbd.Booking)
+
 
 # endregion booking functions
 
@@ -193,6 +198,7 @@ def refresh_treeview(tree, class_):
 def empty_treeview(tree):
     tree.delete(*tree.get_children())
 
+
 main_window = tk.Tk()  # Define the main window
 main_window.title('Topbike')  # Text shown in the top window bar
 main_window.geometry("1100x500")  # window size first is width second is height
@@ -203,11 +209,9 @@ style.theme_use('default')
 style.configure("Treeview", background=treeview_background, foreground=treeview_foreground, rowheight=rowheight, fieldbackground=treeview_background)
 style.map('Treeview', background=[('selected', treeview_selected)])
 
-
 # team region
 frame_teams = tk.LabelFrame(main_window, text="Teams")  # labelframe for teams
 frame_teams.grid(row=0, column=0, padx=padx, pady=pady, sticky=tk.N)  # place frame top left
-
 
 tree_frame_teams = tk.Frame(frame_teams)
 tree_frame_teams.grid(row=0, column=0, padx=padx, pady=pady)
@@ -275,7 +279,6 @@ button_clear_team_entries.grid(row=0, column=4, padx=padx, pady=pady)
 frame_lanes = tk.LabelFrame(main_window, text="Lanes")  # labelframe for lanes
 frame_lanes.grid(row=0, column=1, padx=padx, pady=pady, sticky=tk.N)
 
-
 tree_frame_lanes = tk.Frame(frame_lanes)
 tree_frame_lanes.grid(row=0, column=0, padx=padx, pady=pady)
 tree_scroll_lanes = tk.Scrollbar(tree_frame_lanes)
@@ -312,15 +315,15 @@ label_lane_id.grid(row=0, column=0, padx=padx, pady=pady)
 entry_lane_id = tk.Entry(edit_frame_lanes, width=4, justify="center")
 entry_lane_id.grid(row=1, column=0, padx=padx, pady=pady)
 
-label_lane_date = tk.Label(edit_frame_lanes, text="Max capacity")
-label_lane_date.grid(row=0, column=1, padx=padx, pady=pady)
-entry_lane_date = tk.Entry(edit_frame_lanes, width=10, justify="center")
-entry_lane_date.grid(row=1, column=1, padx=padx, pady=pady)
+label_lane_max_capacity = tk.Label(edit_frame_lanes, text="Max capacity")
+label_lane_max_capacity.grid(row=0, column=1, padx=padx, pady=pady)
+entry_lane_max_capacity = tk.Entry(edit_frame_lanes, width=10, justify="center")
+entry_lane_max_capacity.grid(row=1, column=1, padx=padx, pady=pady)
 
-label_lane_team_id = tk.Label(edit_frame_lanes, text="Difficulty")
-label_lane_team_id.grid(row=0, column=2, padx=padx, pady=pady)
-entry_lane_team_id = tk.Entry(edit_frame_lanes, width=10, justify="center")
-entry_lane_team_id.grid(row=1, column=2, padx=padx, pady=pady)
+label_lane_difficulty = tk.Label(edit_frame_lanes, text="Difficulty")
+label_lane_difficulty.grid(row=0, column=2, padx=padx, pady=pady)
+entry_lane_difficulty = tk.Entry(edit_frame_lanes, width=10, justify="center")
+entry_lane_difficulty.grid(row=1, column=2, padx=padx, pady=pady)
 
 # Define Frame containing buttons
 button_frame_lanes = tk.Frame(controls_frame_lanes)
@@ -333,7 +336,7 @@ button_update_lane = tk.Button(button_frame_lanes, text="Update", command=lambda
 button_update_lane.grid(row=0, column=2, padx=padx, pady=pady)
 button_delete_lane = tk.Button(button_frame_lanes, text="Delete", command=lambda: delete_lane(tree_lanes, read_lane_entries()))
 button_delete_lane.grid(row=0, column=3, padx=padx, pady=pady)
-button_clear_lane_entries = tk.Button(button_frame_lanes, text="Clear Entry Boxes", command=clear_team_entries)
+button_clear_lane_entries = tk.Button(button_frame_lanes, text="Clear Entry Boxes", command=clear_lane_entries)
 button_clear_lane_entries.grid(row=0, column=4, padx=padx, pady=pady)
 
 # lane end region
@@ -341,7 +344,6 @@ button_clear_lane_entries.grid(row=0, column=4, padx=padx, pady=pady)
 
 frame_bookings = tk.LabelFrame(main_window, text="Bookings")  # labelframe for Bookings
 frame_bookings.grid(row=0, column=2, padx=padx, pady=pady, sticky=tk.N)
-
 
 tree_frame_bookings = tk.Frame(frame_bookings)
 tree_frame_bookings.grid(row=0, column=0, padx=padx, pady=pady)
@@ -408,7 +410,7 @@ button_update_booking = tk.Button(button_frame_bookings, text="Update", command=
 button_update_booking.grid(row=0, column=2, padx=padx, pady=pady)
 button_delete_booking = tk.Button(button_frame_bookings, text="Delete", command=lambda: delete_booking(tree_bookings, read_booking_entries()))
 button_delete_booking.grid(row=0, column=3, padx=padx, pady=pady)
-button_clear_booking_entries = tk.Button(button_frame_bookings, text="Clear Entry Boxes", command=clear_team_entries)
+button_clear_booking_entries = tk.Button(button_frame_bookings, text="Clear Entry Boxes", command=clear_booking_entries)
 button_clear_booking_entries.grid(row=0, column=4, padx=padx, pady=pady)
 
 if __name__ == "__main__":
