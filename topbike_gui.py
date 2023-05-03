@@ -27,12 +27,14 @@ def clear_team_entries():  # clear all team entries
 
 
 def write_team_entries(values):
+    # fills team entry boxes
     entry_team_id.insert(0, values[0])
     entry_team_skill_level.insert(0, values[1])
     entry_team_team_size.insert(0, values[2])
 
 
 def edit_team(event, tree):
+    # fills team entries with the selected tree row data
     index_selected = tree.focus()
     values = tree.item(index_selected, "values")
     clear_team_entries()
@@ -40,6 +42,7 @@ def edit_team(event, tree):
 
 
 def create_team(tree, record):
+    # creates a team in the database
     team = tbd.Team.convert_from_tuple(record)
     tbsql.create_record(team)
     clear_team_entries()
@@ -47,6 +50,7 @@ def create_team(tree, record):
 
 
 def update_team(tree, record):
+    # updates a team in the database
     team = tbd.Team.convert_from_tuple(record)
     tbsql.update_team(team)
     clear_team_entries()
@@ -54,6 +58,7 @@ def update_team(tree, record):
 
 
 def delete_team(tree, record):
+    # deletes a team from the database
     team = tbd.Team.convert_from_tuple(record)
     tbsql.update_team(team)
     clear_team_entries()
@@ -65,22 +70,26 @@ def delete_team(tree, record):
 
 
 def read_lane_entries():
-    return entry_booking_id.get(), entry_booking_date.get(), entry_booking_team_id.get()
+    #reads all lane entries and returns them as a tuple
+    return entry_lane_id.get(), entry_lane_max_capacity.get(), entry_lane_difficulty.get()
 
 
 def clear_lane_entries():
+    # clears all lane entries
     entry_lane_id.delete(0, tk.END)
     entry_lane_max_capacity.delete(0, tk.END)
     entry_lane_difficulty.delete(0, tk.END)
 
 
 def write_lane_entries(values):
+    # fills lane entries
     entry_lane_id.insert(0, values[0])
     entry_lane_max_capacity.insert(0, values[1])
     entry_lane_difficulty.insert(0, values[2])
 
 
 def edit_lane(event, tree):
+    # fills lane entries with the selected tree row data
     index_selected = tree.focus()
     values = tree.item(index_selected, "values")
     clear_lane_entries()
@@ -88,6 +97,7 @@ def edit_lane(event, tree):
 
 
 def create_lane(tree, record):
+    # creates a new lane in the database
     lane = tbd.Lane.convert_from_tuple(record)
     tbsql.create_record(lane)
     clear_lane_entries()
@@ -95,6 +105,7 @@ def create_lane(tree, record):
 
 
 def update_lane(tree, record):
+    # updates lane data in the database
     lane = tbd.Lane.convert_from_tuple(record)
     tbsql.update_lane(lane)
     clear_lane_entries()
@@ -102,6 +113,7 @@ def update_lane(tree, record):
 
 
 def delete_lane(tree, record):
+    # soft deletes lane data by invalidating the setting the max_capacity to a negative number
     lane = tbd.Lane.convert_from_tuple(record)
     tbsql.soft_delete_lane(lane)
     clear_lane_entries()
@@ -113,10 +125,12 @@ def delete_lane(tree, record):
 
 
 def read_booking_entries():
+    # reads all booking entries and returns them as a tuple
     return entry_booking_id.get(), entry_booking_date.get(), entry_booking_team_id.get(), entry_booking_lane_id.get()
 
 
 def clear_booking_entries():
+    # clears all booking entries
     entry_booking_id.delete(0, tk.END)
     entry_booking_date.delete(0, tk.END)
     entry_booking_team_id.delete(0, tk.END)
@@ -124,6 +138,7 @@ def clear_booking_entries():
 
 
 def write_booking_entries(values):
+    # fills entry boxes
     entry_booking_id.insert(0, values[0])
     entry_booking_date.insert(0, values[1])
     entry_booking_team_id.insert(0, values[2])
@@ -131,6 +146,7 @@ def write_booking_entries(values):
 
 
 def edit_booking(event, tree):
+    # fills booking entries with the selected tree row data
     index_selected = tree.focus()
     values = tree.item(index_selected, "values")
     clear_booking_entries()
@@ -138,10 +154,11 @@ def edit_booking(event, tree):
 
 
 def create_booking(tree, record):
+    # creates a booking in the database
     booking = tbd.Booking.convert_from_tuple(record)
     print(booking)
-    lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date)
-    capacity_ok = tbf.capacity_ok(tbsql.get_record(tbd.Lane, booking.lane_id), tbsql.get_record(tbd.Team, booking.team_id))
+    lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date) # checks if selected lane is available on that date
+    capacity_ok = tbf.capacity_ok(tbsql.get_record(tbd.Lane, booking.lane_id), tbsql.get_record(tbd.Team, booking.team_id))  # checks if capacity is not a negative number, returns a bool
     if lane_available:  # checks if land is available
         if capacity_ok:  # checks if the max capacity has been reached
             tbsql.create_record(booking)
@@ -154,10 +171,11 @@ def create_booking(tree, record):
 
 
 def update_booking(tree, record):
+    # updates a booking in the database
     booking = tbd.Booking.convert_from_tuple(record)
     print(booking)
-    lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date)
-    capacity_ok = tbf.capacity_ok(tbsql.get_record(tbd.Lane, booking.lane_id), tbsql.get_record(tbd.Team, booking.team_id))
+    lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date) # checks if selected lane is available on that date
+    capacity_ok = tbf.capacity_ok(tbsql.get_record(tbd.Lane, booking.lane_id), tbsql.get_record(tbd.Team, booking.team_id)) # checks if capacity is not a negative number, returns a bool
     if lane_available:  # checks if land is available
         if capacity_ok:  # checks if the max capacity has been reached
             tbsql.update_booking(booking)
@@ -170,6 +188,7 @@ def update_booking(tree, record):
 
 
 def delete_booking(tree, record):
+    # soft deletes a booking by invalidating the date
     booking = tbd.Booking.convert_from_tuple(record)
     tbsql.soft_delete_booking(booking)
     clear_booking_entries()
@@ -191,11 +210,13 @@ def read_table(tree, class_):  # fill tree from database
 
 
 def refresh_treeview(tree, class_):
+    # refreshes the tree
     empty_treeview(tree)
     read_table(tree, class_)
 
 
 def empty_treeview(tree):
+    # clears all items in a treeview
     tree.delete(*tree.get_children())
 
 
@@ -203,16 +224,19 @@ main_window = tk.Tk()  # Define the main window
 main_window.title('Topbike')  # Text shown in the top window bar
 main_window.geometry("1100x500")  # window size first is width second is height
 
-style = ttk.Style()
+style = ttk.Style()  # creates the default style
 style.theme_use('default')
-
+# configures the tree with pre-defined variables
 style.configure("Treeview", background=treeview_background, foreground=treeview_foreground, rowheight=rowheight, fieldbackground=treeview_background)
+# changes row background color when selected
 style.map('Treeview', background=[('selected', treeview_selected)])
 
 # team region
+# create labelframe for teams
 frame_teams = tk.LabelFrame(main_window, text="Teams")  # labelframe for teams
 frame_teams.grid(row=0, column=0, padx=padx, pady=pady, sticky=tk.N)  # place frame top left
 
+# creates and places tree for teams
 tree_frame_teams = tk.Frame(frame_teams)
 tree_frame_teams.grid(row=0, column=0, padx=padx, pady=pady)
 tree_scroll_teams = tk.Scrollbar(tree_frame_teams)
@@ -221,6 +245,7 @@ tree_teams = ttk.Treeview(tree_frame_teams, yscrollcommand=tree_scroll_teams.set
 tree_teams.grid(row=0, column=0, padx=0, pady=pady)
 tree_scroll_teams.config(command=tree_teams.yview)
 
+# configure teams columns and headings
 tree_teams['columns'] = ("id", "skill_level", "team_size")  # Define columns
 tree_teams.column("#0", width=0, stretch=tk.NO)  # Format columns. Suppress the irritating first empty column.
 tree_teams.column("id", anchor=tk.E, width=40)  # "E" stands for East, meaning Right. Possible anchors are N, NE, E, SE, S, SW, W, NW and CENTER
@@ -244,6 +269,7 @@ controls_frame_teams.grid(row=3, column=0, padx=padx, pady=pady)
 edit_frame_teams = tk.Frame(controls_frame_teams)  # Add tuple entry boxes
 edit_frame_teams.grid(row=0, column=0, padx=padx, pady=pady)
 
+# create labels and entries
 label_team_id = tk.Label(edit_frame_teams, text="Id")  # https://www.tutorialspoint.com/python/tk_label.htm
 label_team_id.grid(row=0, column=0, padx=padx, pady=pady)
 entry_team_id = tk.Entry(edit_frame_teams, width=4, justify="center")  # https://www.tutorialspoint.com/python/tk_entry.htm
@@ -276,9 +302,11 @@ button_clear_team_entries.grid(row=0, column=4, padx=padx, pady=pady)
 # team end region-------------------------------------------------------------------------------
 # lane start region--------------------------------------------------------------------------------
 
+# create lanes frame
 frame_lanes = tk.LabelFrame(main_window, text="Lanes")  # labelframe for lanes
 frame_lanes.grid(row=0, column=1, padx=padx, pady=pady, sticky=tk.N)
 
+# creates tree for lanes
 tree_frame_lanes = tk.Frame(frame_lanes)
 tree_frame_lanes.grid(row=0, column=0, padx=padx, pady=pady)
 tree_scroll_lanes = tk.Scrollbar(tree_frame_lanes)
@@ -287,6 +315,7 @@ tree_lanes = ttk.Treeview(tree_frame_lanes, yscrollcommand=tree_scroll_lanes.set
 tree_lanes.grid(row=0, column=0, padx=0, pady=pady)
 tree_scroll_lanes.config(command=tree_lanes.yview)
 
+# configures the columns and heading in the tree
 tree_lanes['columns'] = ("id", "max_capacity", "difficulty")  # Define columns
 tree_lanes.column("#0", width=0, stretch=tk.NO)  # Format columns. Suppress the irritating first empty column.
 tree_lanes.column("id", anchor=tk.E, width=40)  # "E" stands for East, meaning Right. Possible anchors are N, NE, E, SE, S, SW, W, NW and CENTER
@@ -310,6 +339,7 @@ controls_frame_lanes.grid(row=3, column=0, padx=padx, pady=pady)
 edit_frame_lanes = tk.Frame(controls_frame_lanes)  # Add tuple entry boxes
 edit_frame_lanes.grid(row=0, column=0, padx=padx, pady=pady)
 
+# create labels and entries
 label_lane_id = tk.Label(edit_frame_lanes, text="Id")
 label_lane_id.grid(row=0, column=0, padx=padx, pady=pady)
 entry_lane_id = tk.Entry(edit_frame_lanes, width=4, justify="center")
@@ -342,9 +372,11 @@ button_clear_lane_entries.grid(row=0, column=4, padx=padx, pady=pady)
 # lane end region
 # booking start region
 
+# creates frame for bookings
 frame_bookings = tk.LabelFrame(main_window, text="Bookings")  # labelframe for Bookings
 frame_bookings.grid(row=0, column=2, padx=padx, pady=pady, sticky=tk.N)
 
+# creates tree and scrollbar
 tree_frame_bookings = tk.Frame(frame_bookings)
 tree_frame_bookings.grid(row=0, column=0, padx=padx, pady=pady)
 tree_scroll_bookings = tk.Scrollbar(tree_frame_bookings)
@@ -353,6 +385,7 @@ tree_bookings = ttk.Treeview(tree_frame_bookings, yscrollcommand=tree_scroll_boo
 tree_bookings.grid(row=0, column=0, padx=0, pady=pady)
 tree_scroll_bookings.config(command=tree_bookings.yview)
 
+# configures trees columns and headings
 tree_bookings['columns'] = ("id", "date", "team_id", "lane_id")  # Define columns
 tree_bookings.column("#0", width=0, stretch=tk.NO)  # Format columns. Suppress the irritating first empty column.
 tree_bookings.column("id", anchor=tk.E, width=40)  # "E" stands for East, meaning Right. Possible anchors are N, NE, E, SE, S, SW, W, NW and CENTER
@@ -379,6 +412,7 @@ controls_frame_bookings.grid(row=3, column=0, padx=padx, pady=pady)
 edit_frame_bookings = tk.Frame(controls_frame_bookings)  # Add tuple entry boxes
 edit_frame_bookings.grid(row=0, column=0, padx=padx, pady=pady)
 
+# creates labels and entries
 label_booking_id = tk.Label(edit_frame_bookings, text="Id")
 label_booking_id.grid(row=0, column=0, padx=padx, pady=pady)
 entry_booking_id = tk.Entry(edit_frame_bookings, width=4, justify="center")
@@ -413,8 +447,9 @@ button_delete_booking.grid(row=0, column=3, padx=padx, pady=pady)
 button_clear_booking_entries = tk.Button(button_frame_bookings, text="Clear Entry Boxes", command=clear_booking_entries)
 button_clear_booking_entries.grid(row=0, column=4, padx=padx, pady=pady)
 
-if __name__ == "__main__":
+if __name__ == "__main__": # run when file is runned directly
+    # loads in all tree data from database
     refresh_treeview(tree_teams, tbd.Team)
     refresh_treeview(tree_lanes, tbd.Lane)
     refresh_treeview(tree_bookings, tbd.Booking)
-    main_window.mainloop()
+    main_window.mainloop() # window mainloop

@@ -3,9 +3,11 @@ from sqlalchemy import create_engine, select, update, delete
 from datetime import date
 from topbike_data import Team, Lane, Booking, Base
 
-# add the following 7 lines to make foreign key constraints work  https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#sqlite-foreign-keys
+# add the following 9 lines to make foreign key constraints work  https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#sqlite-foreign-keys
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+
+
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
@@ -15,7 +17,8 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 
 Database = "sqlite:///topbike.db"
 
-def create_test_data():  # Optional. Used to test data base functions before gui is ready.
+
+def create_test_data():  # Optional. Used to test database functions before gui is ready.
     with Session(engine) as session:
         new_items = []
         # new_items.append(Container(weight=1200, destination="Oslo"))
@@ -36,7 +39,7 @@ def create_test_data():  # Optional. Used to test data base functions before gui
         session.commit()
 
 def select_all(classparam):
-    # return a list of all records in classparams table
+    # return a list of all records in class table
     with Session(engine) as session:
         records = session.scalars(select(classparam))
         result = []
@@ -47,7 +50,7 @@ def select_all(classparam):
 
 
 def get_record(classparam, record_id):  # https://docs.sqlalchemy.org/en/14/tutorial/data_select.html
-    # return the record in classparams table with a certain id
+    # return the record in a class table with a certain id
     with Session(engine) as session:
         record = session.scalars(select(classparam).where(classparam.id == record_id)).first()
     return record
@@ -79,8 +82,9 @@ def soft_delete_team(team):
 # start region lane functions
 
 def update_lane(lane):
+    # updates a lane record
     with Session(engine) as session:
-        session.execute(delete(Lane).where(Lane.id == lane.id).values(max_capacity=lane.max_capacity, difficulty=lane.difficulty))
+        session.execute(update(Lane).where(Lane.id == lane.id).values(max_capacity=lane.max_capacity, difficulty=lane.difficulty))
         session.commit()
 
 
@@ -95,14 +99,17 @@ def soft_delete_lane(lane):
 
 
 def update_booking(booking):
+    # updates a booking
     with Session(engine) as session:
-        session.execute(delete(Booking).where(Booking.id == booking.id).values(date=booking.date, team_id=booking.team_id, lane_id=booking.lane_id))
+        # session.execute(delete(Lane).where(Lane.id == lane.id).values(max_capacity=lane.max_capacity, difficulty=lane.difficulty))
+        session.execute(update(Booking).where(Booking.id == booking.id).values(date=booking.date, team_id=booking.team_id, lane_id=booking.lane_id))
         session.commit()
 
 
 def soft_delete_booking(booking):
+    # soft deletes a booking by invalidating the valid() function
     with Session(engine) as session:
-        a_date = date(day=1, month=1, year=2000)
+        a_date = date(day=1, month=1, year=2000) # sets the year to 2000
         session.execute(update(Booking).where(Booking.id == booking.id).values(date=a_date, team_id=booking.team_id, lane_id=booking.lane_id))
         session.commit()
 
