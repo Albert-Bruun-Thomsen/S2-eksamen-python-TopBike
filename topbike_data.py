@@ -2,6 +2,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import String, Integer, Date
 from dateutil import parser
+from datetime import date
 
 Base = declarative_base()
 
@@ -77,11 +78,9 @@ class Booking(Base):
         return self.id, self.date, self.team_id, self.lane_id
 
     def valid(self):
-        try:
-            value = int(self.lane_id)
-        except ValueError:
-            return False
-        return value >= 0
+
+        value = self.date.year
+        return value >= 2001
 
     @staticmethod
     def convert_from_tuple(tuple_):

@@ -88,9 +88,26 @@ def soft_delete_lane(lane):
     # soft deletes a record in the lane table by setting max_capacity to -1
     with Session(engine) as session:
         session.execute(update(Lane).where(Lane.id == lane.id).values(max_capacity=-1, difficulty=lane.difficulty))
+        session.commit()
 
 # end region lane
 # start region booking
+
+
+def update_booking(booking):
+    with Session(engine) as session:
+        session.execute(delete(Booking).where(Booking.id == booking.id).values(date=booking.date, team_id=booking.team_id, lane_id=booking.lane_id))
+        session.commit()
+
+
+def soft_delete_booking(booking):
+    with Session(engine) as session:
+        a_date = date(day=1, month=1, year=2000)
+        session.execute(update(Booking).where(Booking.id == booking.id).values(date=a_date, team_id=booking.team_id, lane_id=booking.lane_id))
+        session.commit()
+
+# end region booking functions
+
 
 if __name__ == "__main__":  #executed when file is executed directly
     engine = create_engine(Database, echo=False, future=True)

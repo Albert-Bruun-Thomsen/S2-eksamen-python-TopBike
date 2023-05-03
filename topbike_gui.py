@@ -3,6 +3,7 @@ from tkinter import ttk
 import topbike_data as tbd
 import topbike_sql as tbsql
 import topbike_func as tbf
+from tkinter import messagebox
 
 padx = 8
 pady = 4
@@ -138,14 +139,39 @@ def create_booking(tree, record):
     booking = tbd.Booking.convert_from_tuple(record)
     print(booking)
     lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date)
-    print(lane_available)
-    # capacity_ok = True
-    # if not already_booked: # passes if true
-    #     print("already booked true")
-    #     if capacity_ok:
-    #         print("capacity ok true")
+    capacity_ok = tbf.capacity_ok(tbsql.get_record(tbd.Lane, booking.lane_id), tbsql.get_record(tbd.Team, booking.team_id))
+    if lane_available: # checks if land is available
+        if capacity_ok: # checks if the max capacity has been reached
+            tbsql.create_record(booking)
+            clear_booking_entries()
+            refresh_treeview(tree, tbd.Booking)
+        else:
+            messagebox.showwarning("", "Team size is too big for the Lane!")
+    else:
+        messagebox.showwarning("", "Lane is already booked on that date!")
 
+def update_booking(tree, record):
+    booking = tbd.Booking.convert_from_tuple(record)
+    print(booking)
+    lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date)
+    capacity_ok = tbf.capacity_ok(tbsql.get_record(tbd.Lane, booking.lane_id), tbsql.get_record(tbd.Team, booking.team_id))
+    if lane_available: # checks if land is available
+        if capacity_ok: # checks if the max capacity has been reached
+            tbsql.update_booking(booking)
+            clear_booking_entries()
+            refresh_treeview(tree, tbd.Booking)
+        else:
+            messagebox.showwarning("", "Team size is too big for the Lane!")
+    else:
+        messagebox.showwarning("", "Lane is already booked on that date!")
 
+def delete_booking(tree, record):
+    booking = tbd.Booking.convert_from_tuple(record)
+    tbsql.soft_delete_booking(booking)
+    clear_booking_entries()
+    refresh_treeview(tree, tbd.Booking)
+
+# endregion booking functions
 
 def read_table(tree, class_):  # fill tree from database
     count = 0  # Used to keep track of odd and even rows, because these will be colored differently.
