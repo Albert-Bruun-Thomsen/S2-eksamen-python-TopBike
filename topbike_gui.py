@@ -60,7 +60,7 @@ def update_team(tree, record):
 def delete_team(tree, record):
     # deletes a team from the database
     team = tbd.Team.convert_from_tuple(record)
-    tbsql.update_team(team)
+    tbsql.soft_delete_team(team)
     clear_team_entries()
     refresh_treeview(tree, tbd.Team)
 
