@@ -73,9 +73,9 @@ def clear_lane_entries():
 
 
 def write_lane_entries(values):
-    entry_booking_id.insert(0, values[0])
-    entry_booking_date.insert(0, values[1])
-    entry_booking_team_id.insert(0, values[2])
+    entry_lane_id.insert(0, values[0])
+    entry_lane_date.insert(0, values[1])
+    entry_lane_team_id.insert(0, values[2])
 
 
 def edit_lane(event, tree):
@@ -137,12 +137,13 @@ def edit_booking(event,tree):
 def create_booking(tree, record):
     booking = tbd.Booking.convert_from_tuple(record)
     print(booking)
-    already_booked = tbf.capacity_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date, tbsql.get_record(tbd.Team, booking.team_id))
-    capacity_ok = True
-    if not already_booked: # passes if true
-        print("already booked true")
-        if capacity_ok:
-            print("capacity ok true")
+    lane_available = tbf.lane_available(tbsql.get_record(tbd.Lane, booking.lane_id), booking.date)
+    print(lane_available)
+    # capacity_ok = True
+    # if not already_booked: # passes if true
+    #     print("already booked true")
+    #     if capacity_ok:
+    #         print("capacity ok true")
 
 
 
@@ -168,7 +169,7 @@ def empty_treeview(tree):
 
 main_window = tk.Tk()  # Define the main window
 main_window.title('Topbike')  # Text shown in the top window bar
-main_window.geometry("900x500")  # window size first is width second is height
+main_window.geometry("1100x500")  # window size first is width second is height
 
 style = ttk.Style()
 style.theme_use('default')
@@ -280,20 +281,20 @@ controls_frame_lanes.grid(row=3, column=0, padx=padx, pady=pady)
 edit_frame_lanes = tk.Frame(controls_frame_lanes)  # Add tuple entry boxes
 edit_frame_lanes.grid(row=0, column=0, padx=padx, pady=pady)
 
-label_booking_id = tk.Label(edit_frame_lanes, text="Id")
-label_booking_id.grid(row=0, column=0, padx=padx, pady=pady)
-entry_booking_id = tk.Entry(edit_frame_lanes, width=4, justify="center")
-entry_booking_id.grid(row=1, column=0, padx=padx, pady=pady)
+label_lane_id = tk.Label(edit_frame_lanes, text="Id")
+label_lane_id.grid(row=0, column=0, padx=padx, pady=pady)
+entry_lane_id = tk.Entry(edit_frame_lanes, width=4, justify="center")
+entry_lane_id.grid(row=1, column=0, padx=padx, pady=pady)
 
-label_booking_date = tk.Label(edit_frame_lanes, text="Max capacity")
-label_booking_date.grid(row=0, column=1, padx=padx, pady=pady)
-entry_booking_date = tk.Entry(edit_frame_lanes, width=10, justify="center")
-entry_booking_date.grid(row=1, column=1, padx=padx, pady=pady)
+label_lane_date = tk.Label(edit_frame_lanes, text="Max capacity")
+label_lane_date.grid(row=0, column=1, padx=padx, pady=pady)
+entry_lane_date = tk.Entry(edit_frame_lanes, width=10, justify="center")
+entry_lane_date.grid(row=1, column=1, padx=padx, pady=pady)
 
-label_booking_team_id = tk.Label(edit_frame_lanes, text="Difficulty")
-label_booking_team_id.grid(row=0, column=2, padx=padx, pady=pady)
-entry_booking_team_id = tk.Entry(edit_frame_lanes, width=10, justify="center")
-entry_booking_team_id.grid(row=1, column=2, padx=padx, pady=pady)
+label_lane_team_id = tk.Label(edit_frame_lanes, text="Difficulty")
+label_lane_team_id.grid(row=0, column=2, padx=padx, pady=pady)
+entry_lane_team_id = tk.Entry(edit_frame_lanes, width=10, justify="center")
+entry_lane_team_id.grid(row=1, column=2, padx=padx, pady=pady)
 
 # Define Frame containing buttons
 button_frame_lanes = tk.Frame(controls_frame_lanes)
